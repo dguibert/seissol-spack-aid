@@ -19,14 +19,13 @@ class SeissolUtils(Package):
     homepage = "http://www.seissol.org"
     version('develop',
             git='https://github.com/SeisSol/SeisSol.git',
-            branch='ravil/spack', submodules=True)
+            branch='master', submodules=True)
 
     maintainers = ['ravil-mobile']
 
     variant('cookbook', 
             default=False, 
-            description="fetches cookbook. Be sure that you "
-                        "have access to the SeisSol LRZ-gitlab repo.")
+            description="fetches SeisSol cookbook i.e., exemplary setups")
 
     variant('benchmarks', 
             default=False, 
@@ -35,6 +34,7 @@ class SeissolUtils(Package):
 
     variant('gmsh_gui', default=False, description="enables gui support for gmsh")
     variant('paraview', default=False, description="installs Paraview for visualization")
+    variant('cross_arch_build', default=False, description="installs via cross architectural build")
 
     resource(name='cookbook', 
              git='https://github.com/daisy20170101/SeisSol_Cookbook',
@@ -52,8 +52,15 @@ class SeissolUtils(Package):
     depends_on('glm@0.9.7.1')
     depends_on('proj@4.9.2')
 
-    depends_on("gmsh+hdf5+metis", when='~gmsh_gui') 
-    depends_on("gmsh+hdf5+metis+fltk", when='+gmsh_gui') 
+    depends_on("gmsh+hdf5+metis+netgen", when='~gmsh_gui') 
+    depends_on("gmsh+hdf5+metis+fltk+netgen", when='+gmsh_gui')
+
+    # openblas cannot detect a correct architecture during a cross-arch build
+    # and thus we have to switch to netlib blas
+    depends_on("netlib-lapack", when="+cross_arch_build")
+    depends_on("openblas@:0.3.12", when="%gcc@:10.1.99 ~cross_arch_build")
+
+    depends_on("netgen+metis")
 
     depends_on("paraview+hdf5+qt", when="+paraview") 
     depends_on("mesa~llvm", when="+paraview") 
