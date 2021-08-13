@@ -32,8 +32,8 @@ class SeissolEnv(BundlePackage):
     depends_on('metis +int64 +shared', when="+mpi")
     depends_on('libxsmm@1.15 +generator', when="target=x86_64:")
 
-    depends_on('hdf5@1.8.21 +fortran +shared ~mpi', when="~mpi")
-    depends_on('hdf5@1.8.21 +fortran +shared +mpi', when="+mpi")
+    depends_on('hdf5@1.10.5 +fortran +shared ~mpi', when="~mpi")
+    depends_on('hdf5@1.10.5 +fortran +shared +mpi', when="+mpi")
 
     depends_on('netcdf-c@4.4.0 +shared ~mpi', when="~mpi")
     depends_on('netcdf-c@4.4.0 +shared +mpi', when="+mpi")
