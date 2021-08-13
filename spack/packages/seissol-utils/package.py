@@ -68,10 +68,10 @@ class SeissolUtils(Package):
     depends_on('scons@3.0.1:3.1.2', type='build')
     depends_on('cmake', type='build')
     
-    scons_utils = {'gmsh2gambit': 'preprocessing/meshing/gmsh2gambit',
-                   'cube_c': 'preprocessing/meshing/cube_c'}
+    scons_utils = {'gmsh2gambit': 'preprocessing/meshing/gmsh2gambit'}
 
-    cmake_utils = {'rconv': 'preprocessing/science/rconv'}
+    cmake_utils = {'rconv': 'preprocessing/science/rconv',
+                   'cube_c': 'preprocessing/meshing/cube_c'}
 
     phases = ['build', 'install']
 
