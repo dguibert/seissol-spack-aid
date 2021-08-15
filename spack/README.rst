@@ -317,16 +317,16 @@ Examples
 .. code-block:: bash
 
   # 1. essential packages compiled with gcc compiler suite
-  spack install seissol-utils %gcc@8.3.0
+  spack install seissol-utils %gcc@8.3.0 ^parmetis+int64
 
   # 2. with cookbook and benchmarks and gmsh gmsh GUI
-  spack install seissol-utils+gmsh_gui+cookbook+benchmarks %gcc@8.3.0
+  spack install seissol-utils+gmsh_gui+cookbook+benchmarks %gcc@8.3.0 ^parmetis+int64
 
   # 3. with gmsh GUI, paraview and scons
-  spack install seissol-utils+gmsh_gui+paraview+building_tools %gcc@8.3.0
+  spack install seissol-utils+gmsh_gui+paraview+building_tools %gcc@8.3.0 ^parmetis+int64
 
   # 4. essential packages with simmetrix support for pumgen
-  spack install seissol-utils %gcc@8.3.0 ^pumgen+simmetrix_support 
+  spack install seissol-utils %gcc@8.3.0 ^pumgen+simmetrix_support ^parmetis+int64
 
 Usage
 ~~~~~
