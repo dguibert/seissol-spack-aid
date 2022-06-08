@@ -1,0 +1,59 @@
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
+
+import os
+import shutil
+
+from spack.package import *
+
+
+class Easi(CMakePackage):
+    """easi is a library for the Easy Initialization of models
+    in three (or less or more) dimensional domains.
+    """
+
+    homepage = "https://easyinit.readthedocs.io"
+    git = "https://github.com/SeisSol/easi.git"
+
+    maintainers = ['ThrudPrimrose', 'ravil-mobile', 'krenzland']
+
+    version('develop', branch='master')
+    version('1.2.0', tag='v1.2.0')
+
+    variant('asagi', default=True, description='build with ASAGI support')
+    variant('jit', default='impalajit', description='build with JIT support',
+            values=('impalajit', 'impalajit-llvm'), multi=False)
+    variant('lua', default=False, description='build with lua support')
+
+    depends_on('asagi +mpi +mpi3', when='+asagi')
+    depends_on('yaml-cpp@0.6.2')
+
+
+    depends_on('impalajit')
+    depends_on('lua@5.3.2', when='+lua')
+
+    conflicts('jit=impalajit', when='target=aarch64:')
+    conflicts('jit=impalajit', when='target=ppc64:')
+    conflicts('jit=impalajit', when='target=ppc64le:')
+    conflicts('jit=impalajit', when='target=riscv64:')
+
+    def cmake_args(self):
+
+        args = []
+        args.append(self.define_from_variant('ASAGI', 'asagi'))
+
+        with_impala = 'jit=impalajit' in self.spec
+        with_impala |= 'jit=impalajit-llvm' in self.spec
+        if with_impala:
+            args.append(self.define('IMPALAJIT', True))
+            backend_type = 'llvm' if 'jit=impalajit-llvm' in self.spec else 'original'
+            args.append(self.define('IMPALAJIT_BACKEND', backend_type))
+
+        if '+lua' in self.spec:
+            args.append(self.define('IMPALAJIT', False))
+            args.append(self.define('LUA', True))
+
+        return args
