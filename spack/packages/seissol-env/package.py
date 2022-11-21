@@ -34,17 +34,18 @@ class SeissolEnv(BundlePackage):
     depends_on('metis +int64 +shared', when="+mpi")
     depends_on('libxsmm@1.17 +generator', when="+libxsmm target=x86_64:")
 
-    depends_on('hdf5@1.10.5 +fortran +shared ~mpi', when="~mpi")
-    depends_on('hdf5@1.10.5 +fortran +shared +mpi', when="+mpi")
+    depends_on('hdf5@1.10:1.12.2 +fortran +shared +threadsafe ~mpi', when="~mpi")
+    depends_on('hdf5@1.10:1.12.2 +fortran +shared +threadsafe +mpi', when="+mpi")
 
-    depends_on('netcdf-c@4.6.1 +shared ~mpi', when="~mpi")
-    depends_on('netcdf-c@4.6.1 +shared +mpi', when="+mpi")
+    depends_on('netcdf-c@4.6:4.7.4 +shared ~mpi', when="~mpi")
+    depends_on('netcdf-c@4.6:4.7.4 +shared +mpi', when="+mpi")
 
     depends_on('asagi ~mpi ~mpi3', when="+asagi ~mpi")
     depends_on('asagi +mpi +mpi3', when="+asagi +mpi")
-    
-    depends_on('easi@1.1.2~asagi', when="~asagi")
-    depends_on('easi@1.1.2+asagi', when="+asagi")
+
+    depends_on('easi@1.2 ~asagi', when="~asagi")
+    depends_on('easi@1.2 +asagi', when="+asagi")
+
 
     depends_on('intel-mkl threads=none', when="extra_blas=mkl")
     depends_on('openblas threads=none', when="extra_blas=openblas")
@@ -102,5 +103,5 @@ class SeissolEnv(BundlePackage):
         env.prepend_path('PYTHONPATH', ":".join(filter(None, pythonpath)))
         
         # add pspamm while loading seissol-env
-        env.prepend_path('PYTHONPATH', self.spec.dependencies_dict()['pspamm'].spec.prefix.pspamm)
-        env.prepend_path('PATH', self.spec.dependencies_dict()['pspamm'].spec.prefix.pspamm)
+        env.prepend_path('PYTHONPATH', self.spec['py-pspamm'].prefix)
+        env.prepend_path('PATH', self.spec['py-pspamm'].prefix)
