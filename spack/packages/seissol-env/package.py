@@ -70,7 +70,9 @@ class SeissolEnv(BundlePackage):
     def setup_run_environment(self, env):
         
         roots = []; bins = []; libs = []; includes = []; pkgconfigs = []; pythonpath = []
-        for child_spec in self.spec.dependencies():
+        # easiConfig.cmake need to know where is Findimpalajit.cmake so we also add the dependencies
+        # of easi to CMAKE_PREFIX_PATH
+        for child_spec in self.spec.dependencies() + self.spec['easi'].dependencies():
             roots.append(child_spec.prefix if os.path.isdir(child_spec.prefix) else None)
             bins.append(child_spec.prefix.bin if os.path.isdir(child_spec.prefix.bin) else None)
             libs.append(child_spec.prefix.lib if os.path.isdir(child_spec.prefix.lib) else None)
