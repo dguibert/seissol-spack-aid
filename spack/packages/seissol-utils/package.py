@@ -36,10 +36,10 @@ class SeissolUtils(Package):
     variant('paraview', default=False, description="installs Paraview for visualization")
     variant('cross_arch_build', default=False, description="installs via cross architectural build")
 
-    resource(name='cookbook', 
-             git='https://github.com/daisy20170101/SeisSol_Cookbook',
-             when='+cookbook',
-             placement='cookbook')
+    resource(name='examples', 
+             git='https://github.com/SeisSol/Examples',
+             when='+examples',
+             placement='examples')
 
     resource(name='benchmarks', 
              git='https://gitlab.lrz.de/seissol.org/benchmarks',
@@ -115,8 +115,8 @@ class SeissolUtils(Package):
 
     def install(self, spec, prefix):
 
-        if "+cookbook" in spec:
-            install_tree("cookbook", prefix.cookbook)
+        if "+examples" in spec:
+            install_tree("examples", prefix.examples)
 
         if "+benchmarks" in spec:
             install_tree("benchmarks", prefix.benchmarks)
@@ -139,24 +139,27 @@ class SeissolUtils(Package):
         install_tree(join_path(self.stage.source_path, 'postprocessing/visualization/receiver'), prefix.viz.receiver)
     
     def setup_run_environment(self, env):
-        dependencies = self.spec.dependencies_dict()
-        bins = [self.spec.prefix.gmsh2gambit, 
-                self.spec.prefix.cube_c, 
-                self.spec.prefix.rconv,
-                dependencies["pumgen"].spec.prefix.bin,
-                dependencies["gmsh"].spec.prefix.bin]
+        pumgen = self.spec['pumgen']
+        gmsh = self.spec['gmsh']
+        bins = [self.prefix.gmsh2gambit,
+                self.prefix.cube_c,
+                self.prefix.rconv,
+                pumgen.prefix.bin,
+                gmsh.prefix.bin]
 
         if "+paraview" in self.spec:
-            bins.append(dependencies["paraview"].spec.previx.bin)
+            paraview = self.spec['paraview']
+            bins.append(paraview.prefix.bin)
 
         env.prepend_path('PATH', ":".join(bins))
 
-        if "+cookbook" in self.spec:
-            env.set('COOKBOOK', self.spec.prefix.cookbook)
+        if "+examples" in self.spec:
+            env.set('SEISSOL_EXAMPLES', self.prefix.examples)
 
 
         if "+benchmarks" in self.spec:
-            env.set('BENCHMARKS', self.spec.prefix.benchmarks)
+            env.set('BENCHMARKS', self.prefix.benchmarks)
 
-        env.prepend_path('PATH', self.spec.prefix.viz.receiver.bin)
-        env.prepend_path('PYTNONPATH', self.spec.prefix.viz.receiver.src)
+        env.prepend_path('PATH', self.prefix.viz.receiver.bin)
+        env.prepend_path('PYTNONPATH', self.prefix.viz.receiver.src)
+
