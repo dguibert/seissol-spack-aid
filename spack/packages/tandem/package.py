@@ -27,6 +27,9 @@ class Tandem(CMakePackage):
     variant("domain_dimension", default="2", values=("2", "3"), multi=False)
     variant("min_quadrature_order", default="0")
     variant("libxsmm", default=False, description="installs libxsmm-generator")
+    variant('build_type', default='Release',
+        description='CMake build type',
+        values=('Debug', 'Release', 'RelWithDebInfo'))
 
     depends_on("mpi")
     depends_on("parmetis +int64 +shared")
@@ -55,7 +58,6 @@ class Tandem(CMakePackage):
         arch_dic["zen2"] = "rome"
         arch_dic["zen"] = "naples"
         target = str(self.spec.target)
-
         if target in arch_dic:
             args.append("-DARCH=" + arch_dic[target])
         else:
