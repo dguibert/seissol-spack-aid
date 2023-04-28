@@ -14,12 +14,13 @@ class Tandem(CMakePackage):
     in 2D, tetrahedral meshes in 3D)."""
 
     homepage = "https://tandem.readthedocs.io/en/latest/"
-    version("main", git="https://github.com/TEAR-ERC/tandem.git", branch="main", submodules=True)
+    git = "https://github.com/TEAR-ERC/tandem.git"
+    version("main", branch="main", submodules=True)
 
     # we cannot use the tar.gz file because it does not contains submodules
-    version("1.0", git="https://github.com/TEAR-ERC/tandem.git", tag="v1.0", submodules=True)
-    #when #43 is merged, we can use the when below
-    #patch("fix_v1.0_compilation.diff", when="@1.0")
+    version("1.0", tag="v1.0", submodules=True)
+    # when #43 is merged, we can use the when below
+    # patch("fix_v1.0_compilation.diff", when="@1.0")
     patch("fix_v1.0_compilation.diff")
 
     maintainers = ["dmay23", "Thomas-Ulrich"]
@@ -27,9 +28,12 @@ class Tandem(CMakePackage):
     variant("domain_dimension", default="2", values=("2", "3"), multi=False)
     variant("min_quadrature_order", default="0")
     variant("libxsmm", default=False, description="installs libxsmm-generator")
-    variant('build_type', default='Release',
-        description='CMake build type',
-        values=('Debug', 'Release', 'RelWithDebInfo'))
+    variant(
+        "build_type",
+        default="Release",
+        description="CMake build type",
+        values=("Debug", "Release", "RelWithDebInfo"),
+    )
 
     depends_on("mpi")
     depends_on("parmetis +int64 +shared")
@@ -38,8 +42,10 @@ class Tandem(CMakePackage):
     depends_on("lua@5.3.2:5.4.4")
     depends_on("eigen@3.4.0")
     depends_on("zlib@1.2.8:1.2.13")
-    depends_on("petsc@3.14.6:3.18.5 +int64 +mumps +scalapack")
-    depends_on("petsc@3.14.6:3.18.5 +int64 +mumps +scalapack +knl", when="target=skylake:")
+    depends_on("petsc@3.14.6:3.18.5 +int64 +mumps +scalapack memalign=32")
+    depends_on(
+        "petsc@3.14.6:3.18.5 +int64 +mumps +scalapack +knl", when="target=skylake:"
+    )
     # see https://github.com/TEAR-ERC/tandem/issues/45
     conflicts("%intel")
 
@@ -52,12 +58,13 @@ class Tandem(CMakePackage):
 
         arch_dic = {}
         arch_dic["skylake"] = "skl"
-        arch_dic["skylake_avx512"] = "skx"
+        arch_dic["skylake_avx512"] = "hsw"
         arch_dic["haswell"] = "hsw"
         arch_dic["sandybridge"] = "snb"
         arch_dic["zen2"] = "rome"
         arch_dic["zen"] = "naples"
         target = str(self.spec.target)
+
         if target in arch_dic:
             args.append("-DARCH=" + arch_dic[target])
         else:
