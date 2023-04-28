@@ -28,8 +28,22 @@ class SeissolEnv(BundlePackage):
     variant('memkind', default=True, description="installs memkind")
     variant('python', default=False, description="installs python, pip, numpy and scipy")
     variant('building_tools', default=False, description="installs scons and cmake")    
+    variant("cuda", default=False, description="install libraries for compiling the GPU version based on cuda and sycl")
 
     depends_on('mpi', when="+mpi")
+    # gcc 11 and 12 have a macro __noinline__ that conflicts with the one from cuda 
+    # https://github.com/NVIDIA/thrust/issues/1703 
+    conflicts("%gcc@11:", when="+cuda")
+    # with cuda 12 and llvm 14:15, we have the issue: "error: no template named 'texture" 
+    # https://github.com/llvm/llvm-project/issues/61340
+    conflicts("cuda@12", when="+cuda ^llvm@14:15")
+    # this issue is fixed with llvm 16. SeisSol compiles but does not run on heisenbug:
+    # [hipSYCL Warning] from (...)/cuda_hardware_manager.cpp:55 @ cuda_hardware_manager(): cuda_hardware_manager: Could not obtain number of devices (error code = CUDA:35)
+    # [hipSYCL Error] from (...)/cuda_hardware_manager.cpp:74 @ get_device(): cuda_hardware_manager: Attempt to access invalid device detected.
+    # Therefore the cuda version is set to 11 now, but this constrain could be released in the future
+    depends_on("cuda@11", when="+cuda")
+    depends_on("hipsycl@develop +cuda", when="+cuda")
+
     depends_on('parmetis +int64 +shared', when="+mpi")
     depends_on('metis +int64 +shared', when="+mpi")
     depends_on('libxsmm@1.17 +generator', when="+libxsmm target=x86_64:")
