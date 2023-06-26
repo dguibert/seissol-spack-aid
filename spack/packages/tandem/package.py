@@ -19,9 +19,7 @@ class Tandem(CMakePackage):
 
     # we cannot use the tar.gz file because it does not contains submodules
     version("1.0", tag="v1.0", submodules=True)
-    # when #43 is merged, we can use the when below
-    # patch("fix_v1.0_compilation.diff", when="@1.0")
-    patch("fix_v1.0_compilation.diff")
+    patch("fix_v1.0_compilation.diff", when="@1.0")
 
     maintainers = ["dmay23", "Thomas-Ulrich"]
     variant("polynomial_degree", default="2")
