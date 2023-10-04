@@ -20,10 +20,10 @@ class Pumgen(CMakePackage):
     depends_on('mpi')
         
     depends_on('netcdf-c +shared +mpi', when='+with_netcdf') # NOTE: only tested with 4.4.0 version
-    depends_on('hdf5 +fortran +shared +hl +mpi') # NOTE: only tested with 1.8.21 version
+    depends_on('hdf5@1.10:1.12.2 +fortran +shared +threadsafe +mpi')
     depends_on('pumi +int64 +zoltan ~fortran', when='~with_simmetrix')
     depends_on('simmetrix-simmodsuite', when='+with_simmetrix')
-    depends_on('pumi +int64 simmodsuite=kernels +zoltan ~fortran ~simmodsuite_version_check', when='+with_simmetrix')
+    depends_on('pumi +int64 simmodsuite=base +zoltan ~fortran ~simmodsuite_version_check', when='+with_simmetrix')
     depends_on('zoltan@3.83 +parmetis+int64 ~fortran +shared')
     depends_on('easi@1.2: +asagi', when="+with_simmetrix")
 
@@ -36,7 +36,7 @@ class Pumgen(CMakePackage):
         if 'simmetrix-simmodsuite' in self.spec:
             mpi_id = self.spec["mpi"].name + self.spec["mpi"].version.up_to(1).string
             args.append("-DSIM_MPI=" + mpi_id)
-
+            args.append("-DSIMMETRIX_ROOT=" + self.spec["simmetrix-simmodsuite"].prefix)
         return args                                                                                                 
 
     def install(self, spec, prefix):
