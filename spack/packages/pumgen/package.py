@@ -20,7 +20,7 @@ class Pumgen(CMakePackage):
     depends_on('mpi')
         
     depends_on('netcdf-c +shared +mpi', when='+with_netcdf') # NOTE: only tested with 4.4.0 version
-    depends_on('hdf5@1.10:1.12.2 +fortran +shared +threadsafe +mpi')
+    depends_on('hdf5@1.10:1.12.2 +shared +threadsafe +mpi')
     depends_on('pumi +int64 +zoltan ~fortran', when='~with_simmetrix')
     depends_on('simmetrix-simmodsuite', when='+with_simmetrix')
     depends_on('pumi +int64 simmodsuite=base +zoltan ~fortran ~simmodsuite_version_check', when='+with_simmetrix')
