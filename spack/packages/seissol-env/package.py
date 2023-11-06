@@ -31,9 +31,6 @@ class SeissolEnv(BundlePackage):
     variant("cuda", default=False, description="install libraries for compiling the GPU version based on cuda and sycl")
 
     depends_on('mpi', when="+mpi")
-    # gcc 11 and 12 have a macro __noinline__ that conflicts with the one from cuda 
-    # https://github.com/NVIDIA/thrust/issues/1703 
-    conflicts("%gcc@11:", when="+cuda")
     # with cuda 12 and llvm 14:15, we have the issue: "error: no template named 'texture" 
     # https://github.com/llvm/llvm-project/issues/61340
     conflicts("cuda@12", when="+cuda ^llvm@14:15")
@@ -80,45 +77,3 @@ class SeissolEnv(BundlePackage):
     
     depends_on('cmake@3.12.0:3.16.2', when='+building_tools')
     depends_on('scons@3.0.1:3.1.2', when='+building_tools')
-
-    def setup_run_environment(self, env):
-        
-        roots = []; bins = []; libs = []; includes = []; pkgconfigs = []; pythonpath = []
-        # easiConfig.cmake need to know where is Findimpalajit.cmake so we also add the dependencies
-        # of easi to CMAKE_PREFIX_PATH
-        for child_spec in self.spec.dependencies() + self.spec['easi'].dependencies():
-            roots.append(child_spec.prefix if os.path.isdir(child_spec.prefix) else None)
-            bins.append(child_spec.prefix.bin if os.path.isdir(child_spec.prefix.bin) else None)
-            libs.append(child_spec.prefix.lib if os.path.isdir(child_spec.prefix.lib) else None)
-            includes.append(child_spec.prefix.include if os.path.isdir(child_spec.prefix.include) else None)
-
-            # one has to walk from the current root down in order to find pkgconfig folder
-            # The reason is that some people include "pkgconfig" into "lib" but some put it into "share"
-            # The second reason is to find all 'site-packages' and add them to PYTHONPATH
-            for path, dirs, files in os.walk(child_spec.prefix):
-                if "site-packages" in dirs:
-                    pythonpath.append(os.path.join(path, "site-packages"))
-
-                for file in files:
-                    if file.endswith(".pc"):
-                        pkgconfigs.append(path)
-                        break
-
-        env.prepend_path('CMAKE_PREFIX_PATH', ":".join(filter(None, roots)))
-        env.prepend_path('PKG_CONFIG_PATH', ":".join(filter(None, pkgconfigs)))
-        
-        env.prepend_path('PATH', ":".join(filter(None, bins)))
-        env.prepend_path('LD_LIBRARY_PATH', ":".join(filter(None, libs)))
-        env.prepend_path('LIBRARY_PATH', ":".join(filter(None, libs)))
-        
-        env.prepend_path('CPATH', ":".join(filter(None, includes)))
-        env.prepend_path('CPPPATH', ":".join(filter(None, includes)))
-        env.prepend_path('C_INCLUDE_PATH', ":".join(filter(None, includes)))
-        env.prepend_path('CPLUS_INCLUDE_PATH', ":".join(filter(None, includes)))
-
-        env.prepend_path('PYTHONPATH', ":".join(filter(None, pythonpath)))
-        
-        # add pspamm while loading seissol-env
-        pspamm = self.spec['py-pspamm']
-        env.prepend_path('PYTHONPATH', pspamm.prefix)
-        env.prepend_path('PATH', pspamm.prefix)
