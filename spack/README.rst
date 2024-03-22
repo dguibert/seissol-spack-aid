@@ -18,6 +18,15 @@ reasons of this. :ref:`Known Issues <spack_known_issues>` is a good starting
 point to have a look in case if you face a problem installing SeisSol 
 with Spack.
 
+Additional packages for supermuc
+--------------------------------
+
+This branch contains additional packages for supermuc:
+
+- py-numpy because of https://github.com/spack/spack/pull/43020, merged spack on supermuc is too old
+- easi because of https://github.com/spack/spack/pull/42784, merged spack on supermuc is too old
+- seissol from https://github.com/spack/spack/pull/41176 (not yet merged)
+
 
 General Information
 -------------------
