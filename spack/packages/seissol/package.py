@@ -142,7 +142,7 @@ class Seissol(CMakePackage, CudaPackage, ROCmPackage):
     )
 
     variant(
-        "gemm_tools",
+        "gemm_tools_list",
         default="LIBXSMM,PSpaMM",
         description="gemm toolkit(s) for the (CPU) code generator",
         values=("LIBXSMM", "MKL", "OpenBLAS", "BLIS", "PSpaMM", "Eigen", "LIBXSMM_JIT"),
@@ -195,12 +195,12 @@ class Seissol(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("easi@1.3 ~asagi jit=impalajit,lua", when="~asagi")
     depends_on("easi@1.3 +asagi jit=impalajit,lua", when="+asagi")
 
-    depends_on("intel-mkl threads=none", when="gemm_tools=MKL")
-    depends_on("blis threads=none", when="gemm_tools=BLIS")
-    depends_on("openblas threads=none", when="gemm_tools=OpenBLAS")
-    depends_on("libxsmm@main", when="gemm_tools=LIBXSMM_JIT")
+    depends_on("intel-mkl threads=none", when="gemm_tools_list=MKL")
+    depends_on("blis threads=none", when="gemm_tools_list=BLIS")
+    depends_on("openblas threads=none", when="gemm_tools_list=OpenBLAS")
+    depends_on("libxsmm@main", when="gemm_tools_list=LIBXSMM_JIT")
 
-    conflicts("gemm_tools=LIBXSMM", when="gemm_tools=LIBXSMM_JIT")
+    conflicts("gemm_tools_list=LIBXSMM", when="gemm_tools_list=LIBXSMM_JIT")
 
     depends_on("memkind", when="+memkind target=x86_64:")
 
@@ -213,8 +213,10 @@ class Seissol(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("py-scipy", type="build", when="+python")
     depends_on("py-setuptools", type="build", when="+python")
 
-    depends_on("py-pspamm", when="gemm_tools=PSpaMM", type="build")
-    depends_on("libxsmm@1.17 +generator", when="gemm_tools=LIBXSMM target=x86_64:", type="build")
+    depends_on("py-pspamm", when="gemm_tools_list=PSpaMM", type="build")
+    depends_on(
+        "libxsmm@1.17 +generator", when="gemm_tools_list=LIBXSMM target=x86_64:", type="build"
+    )
 
     # TODO: gemmforge
     # TODO: chainforge
@@ -227,19 +229,19 @@ class Seissol(CMakePackage, CudaPackage, ROCmPackage):
             self.define_from_variant("DR_QUAD_RULE", "dr_quad_rule"),
             self.define_from_variant("ORDER", "convergence_order"),
             self.define_from_variant("EQUATIONS", "equations"),
-            self.define_from_variant("USE_MPI", "mpi"),
-            self.define_from_variant("USE_NETCDF", "netcdf"),
+            self.define_from_variant("MPI", "mpi"),
+            self.define_from_variant("NETCDF", "netcdf"),
         ]
 
-        gemm_tools = ",".join(self.spec.variants["gemm_tools"].value)
-        args.append(f"-DGEMM_TOOLS={gemm_tools}")
+        gemm_tools_list = ",".join(self.spec.variants["gemm_tools_list"].value)
+        args.append(f"-DGEMM_TOOLS_LIST={gemm_tools_list}")
 
         if self.spec.satisfies("+mpi"):
             graph_partitioning_libs = ",".join(self.spec.variants["graph_partitioning_libs"].value)
-            args.append(f"-DGRAPH_PARTITIONG_LIBS={graph_partitioning_libs}")
+            args.append(f"-DGRAPH_PARTITIONING_LIBS={graph_partitioning_libs}")
         else:
             # if no MPI, then no graph partitioning is needed
-            args.append("-DGRAPH_PARTITIONG_LIBS=none")
+            args.append("-DGRAPH_PARTITIONING_LIBS=none")
 
         if self.spec.variants["equations"].value != "viscoelastic2":
             args.append("-DNUMBER_OF_MECHANISMS=0")
@@ -294,9 +296,11 @@ class Seissol(CMakePackage, CudaPackage, ROCmPackage):
         if self.spec.target.family == "aarch64":
             hostarch = "neon"
         if self.spec.target.family == "x86_64":
-            hostarch = "wsm"
+            # pure x86_64v1 doesn't support anything above SSE3
+            hostarch = "noarch"
         if self.spec.target.family == "x86_64_v2":
-            hostarch = "snb"
+            # AVX is only required for x86_64v3 and upwards
+            hostarch = "wsm"
         if self.spec.target.family == "x86_64_v3":
             hostarch = "hsw"
         if self.spec.target.family == "x86_64_v4":
