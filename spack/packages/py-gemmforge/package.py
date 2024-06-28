@@ -18,6 +18,7 @@ class PyGemmforge(PythonPackage):
     license("MIT", checked_by="dguibert")
 
     version("0.0.208", sha256="c0062ef5532ae195cf3867dbaaf6a7de9d6526b3e96258c9a0fb9aaf9850a5a5")
+    version("0.0.207", sha256="15486c56d811d89fa3b6f60ef444b9abece4035ae7d4ee1ec967b95fd0deb95b")
 
     depends_on("py-setuptools", type="build")
     

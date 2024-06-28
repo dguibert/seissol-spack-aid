@@ -40,7 +40,7 @@ class SeissolEnv(BundlePackage):
     # Therefore the cuda version is set to 11 now, but this constrain could be released in the future
     depends_on("cuda@11", when="+cuda")
     depends_on("hipsycl@develop +cuda", when="+cuda")
-    depends_on("py-gemmforge", when="+cuda")
+    depends_on("py-gemmforge@0.0.207", when="+cuda")
 
     depends_on('parmetis +int64 +shared', when="+mpi")
     depends_on('metis +int64 +shared', when="+mpi")
