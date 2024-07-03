@@ -46,7 +46,7 @@ class SeissolUtils(Package):
              when='+benchmarks', 
              placement='benchmarks')
 
-    depends_on('hdf5@1.10:1.12.2 +shared +threadsafe +mpi')
+    depends_on('hdf5@1.10: +shared +threadsafe +mpi')
     depends_on('netcdf-c@4.6.1 +shared +mpi')
     depends_on('pumgen')
     depends_on('glm@0.9.7.1')
