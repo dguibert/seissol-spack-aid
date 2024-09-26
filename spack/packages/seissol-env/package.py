@@ -73,7 +73,7 @@ class SeissolEnv(BundlePackage):
     depends_on('py-matplotlib', when='+python')
     depends_on('py-pip', when='+python')
     depends_on('py-pyopenssl', when='+python')
-    depends_on('python@3.6.0', when='+python')
+    depends_on('python@3.6.0:', when='+python')
     
     depends_on('cmake@3.12.0:3.16.2', when='+building_tools')
     depends_on('scons@3.0.1:3.1.2', when='+building_tools')
