@@ -27,8 +27,16 @@ class Pumgen(CMakePackage):
     depends_on('hdf5@1.10: +shared +threadsafe +mpi')
     depends_on('simmetrix-simmodsuite', when='+with_simmetrix')
     depends_on('pumi +int64 simmodsuite=base +zoltan ~fortran ~simmodsuite_version_check', when='+with_simmetrix +scorec')
+    with when("@1.0.1"):
+        depends_on("pumi +int64 +zoltan ~fortran", when="~with_simmetrix")
+        depends_on(
+            "pumi +int64 simmodsuite=base +zoltan ~fortran ~simmodsuite_version_check",
+            when="+with_simmetrix",
+        )
+
     depends_on('zoltan@3.83 +parmetis+int64 ~fortran +shared')
     depends_on('easi@1.2: +asagi jit=impalajit,lua', when="+with_simmetrix")
+
 
 
     def cmake_args(self):
