@@ -17,7 +17,7 @@ class SeissolEnv(BundlePackage, CudaPackage, ROCmPackage):
     git = "https://github.com/SeisSol/SeisSol.git"
     version("master", branch="master", submodules=True)
     maintainers("Thomas-Ulrich", "davschneller", "vikaskurapati")
-  
+
     variant('mpi', default=True, description="installs an MPI implementation")
     variant('asagi', default=True, description="installs asagi for material input")
 
@@ -31,7 +31,7 @@ class SeissolEnv(BundlePackage, CudaPackage, ROCmPackage):
 
     variant('memkind', default=True, description="installs memkind")
     variant('python', default=False, description="installs python, pip, numpy and scipy")
-    variant('building_tools', default=False, description="installs cmake") 
+    variant('building_tools', default=False, description="installs cmake")
 
    # GPU options
     variant("intel_gpu", default=False, description="Compile for Intel GPUs")
@@ -98,6 +98,7 @@ class SeissolEnv(BundlePackage, CudaPackage, ROCmPackage):
         msg="A value for amdgpu_arch must be specified. Add amdgpu_arch=XX",
     )
 
+    depends_on("py-gemmforge@0.0.207", when="+cuda")
 
     depends_on('parmetis +int64 +shared', when="+mpi")
     depends_on('metis +int64 +shared', when="+mpi")
@@ -132,12 +133,12 @@ class SeissolEnv(BundlePackage, CudaPackage, ROCmPackage):
     depends_on('yaml-cpp@0.6.2')
     depends_on('cxxtest')
     depends_on('eigen@3.4.0')
-    
+
     depends_on('py-numpy', when='+python')
     depends_on('py-scipy', when='+python')
     depends_on('py-matplotlib', when='+python')
     depends_on('py-pip', when='+python')
     depends_on('py-pyopenssl', when='+python')
     depends_on('python@3.6.0:', when='+python')
-    
+
     depends_on('cmake@3.12.0:', when='+building_tools')
