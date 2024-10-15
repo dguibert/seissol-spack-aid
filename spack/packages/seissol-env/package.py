@@ -126,7 +126,7 @@ class SeissolEnv(BundlePackage, CudaPackage, ROCmPackage):
 
     depends_on("py-pspamm", when="gemm_tools_list=PSpaMM")
     depends_on(
-        "libxsmm@1.17 +generator", when="gemm_tools_list=LIBXSMM target=x86_64:")
+        "libxsmm@1.17 +generator", when="gemm_tools_list=LIBXSMM target=x86_64:"
     )
 
 
